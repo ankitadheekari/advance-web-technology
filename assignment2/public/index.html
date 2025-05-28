@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes App</title>
+</head>
+<body>
+    <h1>Quotes</h1>
+    <ul id="quotes-list"></ul>
+
+    <h2>Add a New Quote</h2>
+    <form id="quote-form">
+        <label for="text">Quote:</label>
+        <input type="text" id="text" name="text" required>
+        <br>
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+        <br>
+        <button type="submit">Add Quote</button>
+    </form>
+
+    <script>
+        // Fetch and display quotes
+        function loadQuotes() {
+            const response = fetch('/quotes');
+            const quotes = response.json();
+            const quotesList = document.getElementById('quotes-list');
+            quotesList.innerHTML = quotes.map(q => `<li>"${q.text}" - ${q.author}</li>`).join('');
+        }
+
+        // Handle form submission
+        document.getElementById('quote-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('text').value;
+            const author = document.getElementById('author').value;
+
+            const response = fetch('/quotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text, author })
+            });
+
+            if (response.ok) {
+                alert('Quote added successfully!');
+                document.getElementById('quote-form').reset();
+                loadQuotes();
+            } else {
+                alert('Failed to add quote. Please try again.');
+            }
+        });
+
+        // Load quotes on page load
+        loadQuotes();
+    </script>
+</body>
+</html>
